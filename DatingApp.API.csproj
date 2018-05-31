@@ -9,7 +9,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="Dapper.Contrib" Version="1.50.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="2.1.0" />
+    <!-- <PackageReference Include="sqlite-net-pcl" Version="1.4.118" /> -->
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,9 @@
+@host = http://localhost:5000
+@securehost = https://localhost:5001
+@content = application/json
+@accept = application/json
+
+###
+GET {{securehost}}/api/values HTTP/1.1
+Accept: {{accept}}
+##

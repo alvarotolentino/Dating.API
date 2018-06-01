@@ -13,7 +13,7 @@
     <PackageReference Include="Dapper.Contrib" Version="1.50.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="2.1.0" />
-    <!-- <PackageReference Include="sqlite-net-pcl" Version="1.4.118" /> -->
+    <PackageReference Include="System.Data.Sqlite" Version="1.0.108.0" />
   </ItemGroup>
 
 </Project>

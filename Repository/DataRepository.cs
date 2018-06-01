@@ -4,26 +4,18 @@ using System.Linq;
 using Dapper;
 using Dating.API.Models;
 using Microsoft.Data.Sqlite;
+using System.Data.SqlClient;
 
 namespace Dating.API.Repository
 {
     public class DataRepository : BaseRepository, IDataRepository
     {
-        private IDbConnection _connection;
+        private SqliteConnectionStringBuilder _connectionStringBuilder;
 
         public DataRepository()
-        :base()
         {
-            _connection = new SqliteConnection(_connectionString);
-        }
-
-        private IDbConnection GetConnection(bool open = true)
-        {
-            // if (open)
-            // {
-            //     _connection.Open();
-            // }
-            return _connection;
+            _connectionStringBuilder = new SqliteConnectionStringBuilder();
+            _connectionStringBuilder.DataSource = _connectionString;
         }
 
         public Value RetriveById(int id)
@@ -41,9 +33,10 @@ namespace Dating.API.Repository
             var sql = @"select * 
             from values 
             where id = null or id = @id";
-            using (var cnx = GetConnection())
+
+            using (var connection = new SqliteConnection(_connectionStringBuilder.ConnectionString))
             {
-                var result = cnx.Query<Value>(sql, new{@id = id});
+                var result = connection.Query<Value>(sql, new { @id = id });
                 return result;
             }
         }

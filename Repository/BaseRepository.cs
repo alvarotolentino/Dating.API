@@ -5,7 +5,7 @@ namespace Dating.API.Repository
         protected readonly string _connectionString;
         public BaseRepository()
         {
-            _connectionString = "Data Source=dating.db";
+            _connectionString = "DB/dating.db";
         }
     }
 }

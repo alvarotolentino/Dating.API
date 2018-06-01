@@ -19,18 +19,18 @@ namespace DatingApp.API.Controllers
         }
         // GET api/values
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> GetValues()
         {
-            var result = _repository.Get();
+            var result = await _repository.GetAsync();
             return Ok(result);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> GetValue(int id)
         {
-            var result = _repository.RetriveById(id);
-            return Ok(result);
+            var result = await _repository.GetAsync(id);
+            return Ok(result.FirstOrDefault());
         }
 
         // POST api/values

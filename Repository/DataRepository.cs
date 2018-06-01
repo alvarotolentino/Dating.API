@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
 using Dating.API.Models;
 using Microsoft.Data.Sqlite;
-using System.Data.SqlClient;
 
 namespace Dating.API.Repository
 {
@@ -14,29 +15,29 @@ namespace Dating.API.Repository
 
         public DataRepository()
         {
+            SQLitePCL.Batteries.Init();
             _connectionStringBuilder = new SqliteConnectionStringBuilder();
             _connectionStringBuilder.DataSource = _connectionString;
         }
-
-        public Value RetriveById(int id)
-        {
-            var result = Get(id);
-            if (result != null)
-            {
-                return result.First();
-            }
-            return null;
-        }
-
         public IEnumerable<Value> Get(int? id = null)
         {
-            var sql = @"select * 
-            from values 
-            where id = null or id = @id";
+            var sql = string.Empty;
+            sql = id.HasValue ? @"SELECT * FROM [values] WHERE Id = @Id" : @"SELECT * FROM [values]";
 
             using (var connection = new SqliteConnection(_connectionStringBuilder.ConnectionString))
             {
-                var result = connection.Query<Value>(sql, new { @id = id });
+                var result = connection.Query<Value>(sql, new { Id = id });
+                return result;
+            }
+        }
+
+        public Task<IEnumerable<Value>> GetAsync(int? id = null)
+        {
+            var sql = string.Empty;
+            sql = id.HasValue ? @"SELECT * FROM [values] WHERE Id = @Id" : @"SELECT * FROM [values]";
+            using (var connection = new SqliteConnection(_connectionStringBuilder.ConnectionString))
+            {
+                var result = connection.QueryAsync<Value>(sql, new { Id = id });
                 return result;
             }
         }

@@ -5,41 +5,40 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Dating.API.Models;
-using Microsoft.Data.Sqlite;
 
 namespace Dating.API.Repository
 {
-    public class DataRepository : BaseRepository, IDataRepository
+    public class DataRepository : GenericRepository<Value>, IDataRepository
     {
-        private SqliteConnectionStringBuilder _connectionStringBuilder;
-
-        public DataRepository()
+        IConnectionFactory _connectionFactory;
+        public DataRepository(IConnectionFactory connectionFactory)
         {
-            SQLitePCL.Batteries.Init();
-            _connectionStringBuilder = new SqliteConnectionStringBuilder();
-            _connectionStringBuilder.DataSource = _connectionString;
+            _connectionFactory = connectionFactory;
         }
-        public IEnumerable<Value> Get(int? id = null)
+
+        public new Task<Value> Get(int Id)
         {
             var sql = string.Empty;
-            sql = id.HasValue ? @"SELECT * FROM [values] WHERE Id = @Id" : @"SELECT * FROM [values]";
+            sql = @"SELECT * FROM [values] WHERE Id = @Id";
 
-            using (var connection = new SqliteConnection(_connectionStringBuilder.ConnectionString))
+            using (var connection = _connectionFactory.GetConnection)
             {
-                var result = connection.Query<Value>(sql, new { Id = id });
+                var result = connection.QuerySingleAsync<Value>(sql, new { @Id = Id });
                 return result;
             }
         }
 
-        public Task<IEnumerable<Value>> GetAsync(int? id = null)
+        public new Task<IEnumerable<Value>> GetAll()
         {
             var sql = string.Empty;
-            sql = id.HasValue ? @"SELECT * FROM [values] WHERE Id = @Id" : @"SELECT * FROM [values]";
-            using (var connection = new SqliteConnection(_connectionStringBuilder.ConnectionString))
+            sql = @"SELECT * FROM [values]";
+            using (var connection = _connectionFactory.GetConnection)
             {
-                var result = connection.QueryAsync<Value>(sql, new { Id = id });
+                var result = connection.QueryAsync<Value>(sql);
                 return result;
             }
         }
+
+
     }
 }

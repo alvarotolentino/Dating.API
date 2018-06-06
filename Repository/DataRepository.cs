@@ -16,7 +16,7 @@ namespace Dating.API.Repository
             _connectionFactory = connectionFactory;
         }
 
-        public new Task<Value> Get(int Id)
+        public new Task<Value> Get(long Id)
         {
             var sql = string.Empty;
             sql = @"SELECT * FROM [values] WHERE Id = @Id";

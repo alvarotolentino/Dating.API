@@ -21,7 +21,7 @@ namespace Dating.API.Repository
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> Get(int Id)
+        public Task<TEntity> Get(long Id)
         {
             throw new NotImplementedException();
         }

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Dating.API.Models;
 using Dapper;
+using System.Linq;
 
 namespace Dating.API.Repository
 {
@@ -12,15 +13,17 @@ namespace Dating.API.Repository
         {
             _connectionFactory = connectionFactory;
         }
+
         public async Task<User> Login(string username, string password)
         {
-            var sql = "SELECT * FROM Users WHERE Name = @username";
+            var sql = "SELECT * FROM Users WHERE UserName = @username";
             User user = null;
             using (var connection = _connectionFactory.GetConnection)
             {
                 user = await connection.QuerySingleAsync<User>(sql, new { @username = username });
             }
-            if(user ==null){
+            if (user == null)
+            {
                 return null;
             }
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
@@ -30,6 +33,63 @@ namespace Dating.API.Repository
 
             return user;
 
+        }
+
+        public async Task<User> Register(User user, string password)
+        {
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            var insert = @"INSERT INTO Users (UserName, PasswordHash, PasswordSalt) VALUES(@name, @passwordHash, @passwordSalt); SELECT last_insert_rowid()";
+
+            long idInserted;
+            using (var connection = _connectionFactory.GetConnection)
+            {
+                idInserted = await connection.ExecuteScalarAsync<long>(insert,
+                new
+                {
+                    @name = user.UserName,
+                    @passwordHash = user.PasswordHash,
+                    @passwordSalt = user.PasswordSalt
+                });
+                var result = await Get(idInserted);
+                return result;
+            }
+        }
+
+        public async Task<bool> UserExists(string username)
+        {
+            var sql = "SELECT * FROM Users WHERE UserName = @username";
+            using (var connection = _connectionFactory.GetConnection)
+            {
+                var result = await connection.QueryAsync<User>(sql, new { @username = username });
+                if (result != null & result.Any())
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public new Task<User> Get(long Id)
+        {
+            var sql = "SELECT * FROM Users WHERE Id = @Id";
+            using (var connection = _connectionFactory.GetConnection)
+            {
+                var result = connection.QuerySingleAsync<User>(sql, new { @Id = Id });
+                return result;
+            }
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
         }
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
@@ -47,52 +107,5 @@ namespace Dating.API.Repository
             }
             return true;
         }
-
-        public async Task<User> Register(User user, string password)
-        {
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-
-            var insert = @"INSERT Users (Name, PasswordHash, PasswordSalt) VALUES(@name, @passwordHash, @passwordSalt)";
-            int idInserted;
-            using (var connection = _connectionFactory.GetConnection)
-            {
-                connection.Execute(insert, new { @name = user.UserName, @passwordHash = user.PasswordHash, @passwordSalt = user.PasswordSalt });
-                idInserted = (int)connection.ExecuteScalar("select last_insert_rowid()");
-                var result = await Get(idInserted);
-                return result;
-            }
-        }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-        public Task<bool> UserExists(string username)
-        {
-            
-            using (var connection = _connectionFactory.GetConnection)
-            {
-
-            }
-        }
-
-        public new Task<User> Get(int Id)
-        {
-            var sql = "SELECT * FROM Users WHERE Id = @Id";
-            using (var connection = _connectionFactory.GetConnection)
-            {
-                var result = connection.QuerySingleAsync<User>(sql, new { @Id = Id });
-                return result;
-            }
-        }
-
     }
 }

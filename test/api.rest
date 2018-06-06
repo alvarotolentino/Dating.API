@@ -14,12 +14,59 @@ Accept: {{accept}}
 GET {{host}}/api/values/1 HTTP/1.1
 Accept: {{accept}}
 ###
+// Register username and password
+POST {{host}}/api/auth/register HTTP/1.1
+Content-Type: {{content}}
 
+{
+    "username": "username",
+    "password": "password"
+}
+###
+// Test register user
 POST {{host}}/api/auth/register HTTP/1.1
 Content-Type: {{content}}
 
 {
     "username": "{{$guid}}",
-    "password": "{{$guid}}"
+    "password": "{{$randomInt 1000 99999999}}"
+}
+###
+
+// Username is already taken
+POST {{host}}/api/auth/register HTTP/1.1
+Content-Type: {{content}}
+
+{
+    "username": "user",
+    "password": "{{$randomInt 1000 99999999}}"
+}
+###
+
+// Invalid request
+POST {{host}}/api/auth/register HTTP/1.1
+Content-Type: {{content}}
+
+{
+    "username": "",
+    "password": ""
+}
+###
+// Username is required
+POST {{host}}/api/auth/register HTTP/1.1
+Content-Type: {{content}}
+
+{
+    "username": "",
+    "password": "{{$randomInt 1000 99999999}}"
+}
+###
+// Register username and password
+POST {{host}}/api/auth/login HTTP/1.1
+Content-Type: {{content}}
+
+{
+    "username": "username",
+    "password": "password"
 }
 ###

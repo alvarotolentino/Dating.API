@@ -20,7 +20,7 @@ namespace Dating.API.Repository
             User user = null;
             using (var connection = _connectionFactory.GetConnection)
             {
-                user = await connection.QuerySingleAsync<User>(sql, new { @username = username });
+                user = await connection.QueryFirstOrDefaultAsync<User>(sql, new { @username = username });
             }
             if (user == null)
             {
@@ -64,8 +64,8 @@ namespace Dating.API.Repository
             var sql = "SELECT * FROM Users WHERE UserName = @username";
             using (var connection = _connectionFactory.GetConnection)
             {
-                var result = await connection.QueryAsync<User>(sql, new { @username = username });
-                if (result != null & result.Any())
+                var result = await connection.QueryFirstOrDefaultAsync<User>(sql, new { @username = username });
+                if (result != null)
                 {
                     return true;
                 }
@@ -78,7 +78,7 @@ namespace Dating.API.Repository
             var sql = "SELECT * FROM Users WHERE Id = @Id";
             using (var connection = _connectionFactory.GetConnection)
             {
-                var result = connection.QuerySingleAsync<User>(sql, new { @Id = Id });
+                var result = connection.QueryFirstOrDefaultAsync<User>(sql, new { @Id = Id });
                 return result;
             }
         }

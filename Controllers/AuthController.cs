@@ -53,7 +53,7 @@ namespace Dating.API.Controllers
             {
                 return Unauthorized();
             }
-            
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("super secure key");
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -67,7 +67,6 @@ namespace Dating.API.Controllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha512Signature)
             };
-
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
             return Ok(new { tokenString });

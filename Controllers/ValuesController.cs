@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dating.API.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DatingApp.API.Controllers
 {
+
+    [Authorize]
     [Route("api/[controller]")]
-    [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesController : Controller
     {
         private readonly IDataRepository _repository;
 

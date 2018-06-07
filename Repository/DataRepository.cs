@@ -23,7 +23,7 @@ namespace Dating.API.Repository
 
             using (var connection = _connectionFactory.GetConnection)
             {
-                var result = connection.QuerySingleAsync<Value>(sql, new { @Id = Id });
+                var result = connection.QueryFirstOrDefaultAsync<Value>(sql, new { @Id = Id });
                 return result;
             }
         }

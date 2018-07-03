@@ -27,7 +27,6 @@ namespace Dating.API.Controllers {
         public async Task<IActionResult> Register ([FromBody] UserForRegisterDto userForRegisterDto) {
             if (!string.IsNullOrWhiteSpace (userForRegisterDto.Username)) {
                 userForRegisterDto.Username = userForRegisterDto.Username.ToLower ();
-
             }
 
             if (await _repository.UserExists (userForRegisterDto.Username)) {
@@ -48,8 +47,6 @@ namespace Dating.API.Controllers {
 
         [HttpPost ("login")]
         public async Task<IActionResult> Login ([FromBody] UserForLoginDto userForLoginDto) {
-            throw new Exception ("Computer says no!");
-
             var userFromRepo = await _repository.Login (userForLoginDto.Username.ToLower (), userForLoginDto.Password);
             if (userFromRepo == null) {
                 return Unauthorized ();
